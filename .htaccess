@@ -1,0 +1,4 @@
+AuthType     Basic
+AuthName     " "
+AuthUserFile BGM_BOOKs/htpasswd/.htpasswd
+require valid-user
