@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<!-- Created with https://packager.turbowarp.org/ -->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <!-- We only include this to explicitly loosen the CSP of various packager environments. It does not provide any security. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: blob:">
+  <title>BGM_BOOKs</title>
+  <style>
+    body {
+      color: #c1d4ff;
+      font-family: sans-serif;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+    :root, body.is-fullscreen {
+      background-color: #e0ffff;
+    }
+    [hidden] {
+      display: none !important;
+    }
+    h1 {
+      font-weight: normal;
+    }
+    a {
+      color: inherit;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    #app, #loading, #error, #launch {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      cursor: default;
+      user-select: none;
+      -webkit-user-select: none;
+      background-color: #e0ffff;
+    }
+    #launch {
+      background-color: rgba(0, 0, 0, 0.7);
+      cursor: pointer;
+    }
+    .green-flag {
+      width: 80px;
+      height: 80px;
+      padding: 16px;
+      border-radius: 100%;
+      background: rgba(255, 255, 255, 0.75);
+      border: 3px solid hsla(0, 100%, 100%, 1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box;
+    }
+    #loading {
+      
+    }
+    .progress-bar-outer {
+      border: 1px solid currentColor;
+      height: 10px;
+      width: 200px;
+      max-width: 200px;
+    }
+    .progress-bar-inner {
+      height: 100%;
+      width: 0;
+      background-color: currentColor;
+    }
+    .loading-text, noscript {
+      font-weight: normal;
+      font-size: 36px;
+      margin: 0 0 16px;
+    }
+    .loading-image {
+      margin: 0 0 16px;
+    }
+    #error-message, #error-stack {
+      font-family: monospace;
+      max-width: 600px;
+      white-space: pre-wrap;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+    #error-stack {
+      text-align: left;
+      max-height: 200px;
+      overflow: auto;
+    }
+    .control-button {
+      width: 2rem;
+      height: 2rem;
+      padding: 0.375rem;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+      user-select: none;
+      -webkit-user-select: none;
+      cursor: pointer;
+      border: 0;
+      border-radius: 4px;
+    }
+    .control-button:hover {
+      background: #c2d5ff26;
+    }
+    .control-button.active {
+      background: #c2d5ff59;
+    }
+    .fullscreen-button {
+      background: white !important;
+    }
+    .standalone-fullscreen-button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      border-radius: 0 0 0 4px;
+      padding: 4px;
+      cursor: pointer;
+    }
+    .sc-canvas {
+      cursor: auto;
+    }
+    .sc-monitor-root[data-opcode^="data_"] .sc-monitor-value-color {
+      background-color: #cbffff;
+    }
+    .sc-monitor-row-value-outer {
+      background-color: #cbffff;
+    }
+    .sc-monitor-row-value-editing .sc-monitor-row-value-outer {
+      background-color: #b6e5e5;
+    }
+    
+  </style>
+  <meta name="theme-color" content="#e0ffff">
+  <link rel="icon" href="data:image/png;base64,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">
+</head>
+<body>
+  <div id="app"></div>
+
+  <div id="launch" class="screen" hidden title="Click to start">
+    <div class="green-flag">
+      <svg viewBox="0 0 16.63 17.5" width="42" height="44">
+        <defs><style>.cls-1,.cls-2{fill:#4cbf56;stroke:#45993d;stroke-linecap:round;stroke-linejoin:round;}.cls-2{stroke-width:1.5px;}</style></defs>
+        <path class="cls-1" d="M.75,2A6.44,6.44,0,0,1,8.44,2h0a6.44,6.44,0,0,0,7.69,0V12.4a6.44,6.44,0,0,1-7.69,0h0a6.44,6.44,0,0,0-7.69,0"/>
+        <line class="cls-2" x1="0.75" y1="16.75" x2="0.75" y2="0.75"/>
+      </svg>
+    </div>
+  </div>
+
+  <div id="loading" class="screen">
+    <noscript>Enable JavaScript</noscript>
+    <h1 class="loading-text">ロード中...</h1>
+    
+    <div class="progress-bar-outer"><div class="progress-bar-inner" id="loading-inner"></div></div>
+  </div>
+
+  <div id="error" class="screen" hidden>
+    <h1>Error</h1>
+    <details>
+      <summary id="error-message"></summary>
+      <p id="error-stack"></p>
+    </details>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    const appElement = document.getElementById('app');
+    const launchScreen = document.getElementById('launch');
+    const loadingScreen = document.getElementById('loading');
+    const loadingInner = document.getElementById('loading-inner');
+    const errorScreen = document.getElementById('error');
+    const errorScreenMessage = document.getElementById('error-message');
+    const errorScreenStack = document.getElementById('error-stack');
+
+    const handleError = (error) => {
+      console.error(error);
+      if (!errorScreen.hidden) return;
+      errorScreen.hidden = false;
+      errorScreenMessage.textContent = '' + error;
+      let debug = error && error.stack || 'no stack';
+      debug += '\nUser agent: ' + navigator.userAgent;
+      errorScreenStack.textContent = debug;
+    };
+    const setProgress = (progress) => {
+      if (loadingInner) loadingInner.style.width = progress * 100 + '%';
+    };
+    const interpolate = (a, b, t) => a + t * (b - a);
+
+    try {
+      setProgress(0.1);
+
+      const scaffolding = new Scaffolding.Scaffolding();
+      scaffolding.width = 480;
+      scaffolding.height = 360;
+      scaffolding.resizeMode = "preserve-ratio";
+      scaffolding.editableLists = false;
+      scaffolding.usePackagedRuntime = true;
+      scaffolding.setup();
+      scaffolding.appendTo(appElement);
+
+      const vm = scaffolding.vm;
+      window.scaffolding = scaffolding;
+      window.vm = scaffolding.vm;
+      window.Scratch = {
+        vm,
+        renderer: vm.renderer,
+        audioEngine: vm.runtime.audioEngine,
+        bitmapAdapter: vm.runtime.v2BitmapAdapter,
+        videoProvider: vm.runtime.ioDevices.video.provider
+      };
+
+      scaffolding.setUsername("player####".replace(/#/g, () => Math.floor(Math.random() * 10)));
+      scaffolding.setAccentColor("#c2d5ff");
+
+      try {
+        scaffolding.addCloudProvider(new Scaffolding.Cloud.WebSocketProvider(["wss://clouddata.turbowarp.org","wss://clouddata.turbowarp.xyz"], "1000283286"));
+      } catch (error) {
+        console.error(error);
+      }
+
+      vm.setTurboMode(false);
+      if (vm.setInterpolation) vm.setInterpolation(false);
+      if (vm.setFramerate) vm.setFramerate(30);
+      if (vm.renderer.setUseHighQualityRender) vm.renderer.setUseHighQualityRender(false);
+      if (vm.setRuntimeOptions) vm.setRuntimeOptions({
+        fencing: true,
+        miscLimits: true,
+        maxClones: 300,
+      });
+      if (vm.setCompilerOptions) vm.setCompilerOptions({
+        enabled: true,
+        warpTimer: false
+      });
+      if (vm.renderer.setMaxTextureDimension) vm.renderer.setMaxTextureDimension(2048);
+
+      if (typeof ScaffoldingAddons !== 'undefined') {
+        ScaffoldingAddons.run(scaffolding, {"gamepad":false,"pointerlock":false,"specialCloudBehaviors":false,"unsafeCloudBehaviors":false,"pause":false});
+      }
+
+      scaffolding.setExtensionSecurityManager({
+        getSandboxMode: () => 'unsandboxed',
+        canLoadExtensionFromProject: () => true
+      });
+      for (const extension of []) {
+        vm.extensionManager.loadExtensionURL(extension);
+      }
+
+      vm.runtime.on('PROJECT_RUN_STOP', () => {
+        if (!vm.isPaused || !vm.isPaused()) {
+          window.close();
+        }
+      });
+
+    } catch (e) {
+      handleError(e);
+    }
+  </script>
+  
+  
+    <script>
+      const getProjectData = (function() {
+        const storage = scaffolding.storage;
+        storage.onprogress = (total, loaded) => {
+          setProgress(interpolate(0.2, 0.98, loaded / total));
+        };
+        
+        storage.addWebStore(
+          [
+            storage.AssetType.ImageVector,
+            storage.AssetType.ImageBitmap,
+            storage.AssetType.Sound,
+            storage.AssetType.Font
+          ].filter(i => i),
+          (asset) => new URL('./assets/' + asset.assetId + '.' + asset.dataFormat, location).href
+        );
+        return () => new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = () => {
+          resolve(xhr.response);
+        };
+        xhr.onerror = () => {
+          if (location.protocol === 'file:') {
+            reject(new Error('Zip environment must be used from a website, not from a file URL.'));
+          } else {
+            reject(new Error('Request to load project data failed.'));
+          }
+        };
+        xhr.onprogress = (e) => {
+          if (e.lengthComputable) {
+            setProgress(interpolate(0.1, 0.2, e.loaded / e.total));
+          }
+        };
+        xhr.responseType = 'arraybuffer';
+        xhr.open('GET', "./assets/project.json");
+        xhr.send();
+      });
+      })();
+    </script>
+  <script>
+    const run = async () => {
+      const projectData = await getProjectData();
+      await scaffolding.loadProject(projectData);
+      setProgress(1);
+      loadingScreen.hidden = true;
+      if (true) {
+        scaffolding.start();
+      } else {
+        launchScreen.hidden = false;
+        launchScreen.addEventListener('click', () => {
+          launchScreen.hidden = true;
+          scaffolding.start();
+        });
+        launchScreen.focus();
+      }
+    };
+    run().catch(handleError);
+  </script>
+</body>
+</html>
